@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Progress — InterviewIQ{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-2">Progress analytics</h1>
+    <p class="muted mb-4">Scores are calculated from interviews saved to your account.</p>
+
+    <div class="stat-grid mb-4">
+        <div class="stat-card card-soft"><div class="muted">Total interviews</div><h3>{{ stats.count }}</h3></div>
+        <div class="stat-card card-soft"><div class="muted">Average score</div><h3>{{ stats.average }}%</h3></div>
+        <div class="stat-card card-soft"><div class="muted">Best score</div><h3>{{ stats.best }}%</h3></div>
+        <div class="stat-card card-soft"><div class="muted">Readiness score</div><h3>{{ stats.readiness }}%</h3></div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card-soft">
+                <h5>Score over time</h5>
+                {% if stats.scores %}
+                <canvas id="timeChart" height="140"></canvas>
+                {% else %}
+                <div class="empty-state"><p class="muted mb-0">Complete interviews to plot your score trend.</p></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card-soft">
+                <h5>Category performance</h5>
+                {% if stats.category_scores %}
+                <canvas id="catChart" height="140"></canvas>
+                {% else %}
+                <div class="empty-state"><p class="muted mb-0">Category averages appear after your first saved interview.</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4"><div class="card-soft"><div class="muted">Strongest area</div><h3>{{ stats.strongest or "—" }}</h3></div></div>
+        <div class="col-md-4"><div class="card-soft"><div class="muted">Weakest area</div><h3>{{ stats.weakest or "—" }}</h3></div></div>
+        <div class="col-md-4">
+            <div class="card-soft">
+                <h5>Improvement suggestions</h5>
+                <ul class="mb-0">{% for s in stats.suggestions %}<li>{{ s }}</li>{% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+{% if stats.scores %}
+drawLineChart("timeChart", {{ stats.labels|tojson }}, {{ stats.scores|tojson }}, "Score");
+{% endif %}
+{% if stats.category_scores %}
+drawBarChart("catChart", {{ stats.category_labels|tojson }}, {{ stats.category_scores|tojson }});
+{% endif %}
+</script>
+{% endblock %}

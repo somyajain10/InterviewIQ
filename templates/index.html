@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}InterviewIQ — Practice. Analyze. Improve.{% endblock %}
+{% block content %}
+<section class="hero container">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <div class="hero-kicker"><i class="bi bi-stars"></i> AI-powered mock interviews for students</div>
+            <h1>Turn Every Interview Into a Learning Experience</h1>
+            <p class="lead">Practice realistic mock interviews, analyze your responses, and discover exactly how to improve your interview performance.</p>
+            <div class="hero-actions">
+                <a class="btn btn-main" href="{{ url_for('signup') }}">START FREE INTERVIEW</a>
+                <a class="btn btn-ghost" href="#how">SEE HOW IT WORKS</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="report-visual">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <strong>Sample Interview Report</strong>
+                    <span class="badge-soft">HR · Intermediate</span>
+                </div>
+                <div class="score-orb"><span>82</span></div>
+                <p class="text-center muted mb-4">Overall interview score</p>
+                <div class="metric-row">
+                    <div class="metric"><span class="muted">Relevance</span><b>85%</b></div>
+                    <div class="metric"><span class="muted">Clarity</span><b>80%</b></div>
+                    <div class="metric"><span class="muted">Filler words</span><b>3</b></div>
+                    <div class="metric"><span class="muted">Speaking pace</span><b>138 WPM</b></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section container" id="features">
+    <h2>Everything you need to practise with purpose</h2>
+    <p class="sub">InterviewIQ combines a live interview room, simple scoring, and optional Gemini feedback.</p>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-chat-square-text"></i></div><h5>AI Mock Interviews</h5><p class="muted mb-0">HR, Technical, Behavioral, and General rounds with beginner to advanced questions.</p></div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-mic"></i></div><h5>Voice & Text Answers</h5><p class="muted mb-0">Speak with the browser microphone or type if speech recognition is not available.</p></div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-graph-up"></i></div><h5>Smart Performance Analysis</h5><p class="muted mb-0">Word count, speaking speed, filler words, and keyword relevance — all explainable.</p></div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-lightbulb"></i></div><h5>Personalized Feedback</h5><p class="muted mb-0">Gemini suggests strengths, weaknesses, and a stronger version of your answer.</p></div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-bar-chart"></i></div><h5>Progress Tracking</h5><p class="muted mb-0">See score over time, strongest category, and a simple readiness percentage.</p></div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card"><div class="icon-pill"><i class="bi bi-clock-history"></i></div><h5>Interview History</h5><p class="muted mb-0">Re-open any completed report, filter by type, and sort by score or date.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="section container" id="how">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+            <h2>How InterviewIQ works</h2>
+            <p class="sub">Five steps from setup to a saved performance report.</p>
+        </div>
+        <div class="col-lg-7 card-soft">
+            <div class="step"><div class="step-num">1</div><div><h5>Choose Your Interview</h5><p class="muted mb-0">Pick type, difficulty, job role, and number of questions.</p></div></div>
+            <div class="step"><div class="step-num">2</div><div><h5>Answer Questions</h5><p class="muted mb-0">Speak or type. A timer tracks how long you take.</p></div></div>
+            <div class="step"><div class="step-num">3</div><div><h5>Get Analyzed</h5><p class="muted mb-0">Python scores your answer; Gemini adds coaching when configured.</p></div></div>
+            <div class="step"><div class="step-num">4</div><div><h5>Understand Your Weaknesses</h5><p class="muted mb-0">See filler words, relevance, completeness, and an improved answer.</p></div></div>
+            <div class="step"><div class="step-num">5</div><div><h5>Improve</h5><p class="muted mb-0">Save the report, watch progress charts, and practise again.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="section container" id="why">
+    <h2>Why InterviewIQ?</h2>
+    <p class="sub">Most students practise questions in a notebook. InterviewIQ turns that practice into measurable feedback.</p>
+    <div class="row g-4">
+        <div class="col-md-4"><div class="feature-card"><h5>Built for viva clarity</h5><p class="muted mb-0">Scoring formulas are written in comments. You can explain every number.</p></div></div>
+        <div class="col-md-4"><div class="feature-card"><h5>Works without every API</h5><p class="muted mb-0">If MongoDB or Gemini is offline, demo mode and basic analysis keep the demo running.</p></div></div>
+        <div class="col-md-4"><div class="feature-card"><h5>Real interview habits</h5><p class="muted mb-0">Voice answers, filler-word detection, and structured reports match how interviews feel.</p></div></div>
+    </div>
+</section>
+
+<section class="section container faq" id="faq">
+    <h2>Frequently asked questions</h2>
+    <div class="accordion" id="faqAcc">
+        <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#f1">Do I need a microphone?</button></h2>
+            <div id="f1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc"><div class="accordion-body">No. You can type every answer. Chrome supports the Web Speech API for voice-to-text; other browsers may need typing.</div></div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f2">Is my password stored in plain text?</button></h2>
+            <div id="f2" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">No. InterviewIQ hashes passwords with Werkzeug before saving them in MongoDB or demo memory.</div></div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f3">What if Gemini is not configured?</button></h2>
+            <div id="f3" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">The interview still runs. Python calculates word count, WPM, fillers, and keyword relevance, then shows a clear fallback message.</div></div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#f4">Is this a trained machine-learning model?</button></h2>
+            <div id="f4" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">No. Basic analysis is rule-based. Optional feedback comes from the Gemini API through Flask, never from the browser.</div></div>
+        </div>
+    </div>
+</section>
+{% endblock %}

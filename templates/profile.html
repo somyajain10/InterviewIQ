@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile — InterviewIQ{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 720px;">
+    <h1 class="mb-4">Profile & settings</h1>
+    <div class="card-soft mb-4">
+        <p class="muted mb-1">Email</p>
+        <h5>{{ user.email }}</h5>
+        <p class="muted mb-1 mt-3">Account created</p>
+        <h5>{{ created }}</h5>
+    </div>
+    <form class="card-soft mb-4" method="post">
+        <label class="form-label">Full name</label>
+        <input class="form-control mb-3" name="name" value="{{ user.name }}" required>
+        <button class="btn btn-main" type="submit">Update name</button>
+    </form>
+    <div class="card-soft mb-4">
+        <h5>Theme preference</h5>
+        <p class="muted">Theme is stored in this browser with localStorage.</p>
+        <button class="btn btn-ghost" type="button" data-theme-toggle>Toggle light / dark mode</button>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('logout') }}">Logout</a>
+</div>
+{% endblock %}

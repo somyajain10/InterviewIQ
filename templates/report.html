@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Interview Report — InterviewIQ{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="muted mb-1">{{ item.type }} · {{ item.difficulty }} · {{ item.job_role }}</p>
+            <h1 class="mb-0">Final performance report</h1>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge-soft">{{ item.created_at|when }}</span>
+            {% if item.ai_available %}
+            <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-stars"></i> Gemini AI</span>
+            {% else %}
+            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Rule-based Analysis</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Score & Chart Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+            <div class="card-soft text-center h-100 d-flex flex-column justify-content-center py-4">
+                <div class="muted small text-uppercase fw-bold">Overall Score</div>
+                <div class="score-big text-primary my-2">{{ item.overall_score }}<span style="font-size: 1.5rem;">/100</span></div>
+                
+                <div class="mt-2">
+                    <span class="badge fs-6 px-3 py-2 
+                        {% if item.overall_score >= 85 %}bg-success
+                        {% elif item.overall_score >= 70 %}bg-primary
+                        {% elif item.overall_score >= 50 %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ item.performance_category or (item.summary and item.summary.performance_category) or 'Completed' }}
+                    </span>
+                </div>
+                <p class="muted small mt-3 mb-0">Performance Category</p>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card-soft h-100">
+                <h6 class="fw-bold mb-2">Core Skills Evaluation</h6>
+                <canvas id="radarChart" height="130"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explainable Viva Metrics -->
+    <h5 class="mb-3 fw-bold">Explainable Performance Metrics</h5>
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card card-soft h-100">
+                <div class="muted small">Questions Answered</div>
+                <h3>{{ item.summary.questions_answered if item.summary.questions_answered is defined else item.answers|length }} / {{ item.questions|length }}</h3>
+                <small class="muted">completion rate</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card card-soft h-100">
+                <div class="muted small">Average Answer Length</div>
+                <h3>{{ item.summary.avg_word_count }} words</h3>
+                <small class="muted">{{ item.summary.total_words }} total words</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card card-soft h-100">
+                <div class="muted small">Total Filler Words</div>
+                <h3>{{ item.summary.total_fillers }}</h3>
+                <small class="muted">{% if item.summary.total_fillers == 0 %}Clean delivery!{% else %}Recorded during session{% endif %}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card card-soft h-100">
+                <div class="muted small">Keyword / Relevance</div>
+                <h3>{{ item.scores.relevance }}%</h3>
+                <small class="muted">content match score</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Summary Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-mic text-primary fs-5"></i>
+                    <h5 class="mb-0">Communication Feedback</h5>
+                </div>
+                <p class="muted mb-0">{{ item.summary.communication_feedback or 'Consistent speech cadence and vocal articulation observed.' }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-journal-check text-primary fs-5"></i>
+                    <h5 class="mb-0">Content & Technical Feedback</h5>
+                </div>
+                <p class="muted mb-0">{{ item.summary.content_feedback or 'Answers evaluated against topic syllabus keywords and completeness criteria.' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <h5><i class="bi bi-check-circle text-success me-1"></i> Strengths</h5>
+                <ul class="mb-0">{% for s in item.summary.strengths %}<li>{{ s }}</li>{% else %}<li>Keep practising to collect strengths.</li>{% endfor %}</ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <h5><i class="bi bi-exclamation-triangle text-warning me-1"></i> Weaknesses</h5>
+                <ul class="mb-0">{% for s in item.summary.weaknesses %}<li>{{ s }}</li>{% else %}<li>No major weaknesses detected.</li>{% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-soft mb-4">
+        <h5><i class="bi bi-lightbulb text-primary me-1"></i> Improvement Suggestions</h5>
+        <ol class="mb-0">{% for s in item.summary.recommendations %}<li>{{ s }}</li>{% else %}<li>Practice speaking with direct STAR examples.</li>{% endfor %}</ol>
+    </div>
+
+    <!-- Complete Question-Wise Results -->
+    <div class="card-soft mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="bi bi-list-check me-2"></i> Question-Wise Results</h5>
+            <span class="badge bg-light text-dark border">{{ item.answers|length }} Question{% if item.answers|length != 1 %}s{% endif %} Evaluated</span>
+        </div>
+
+        {% for a in item.answers %}
+        <div class="p-3 mb-3 border rounded bg-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                <h6 class="fw-bold mb-0">Question {{ loop.index }}: {{ a.question }}</h6>
+                <span class="badge 
+                    {% if a.analysis.overall >= 80 %}bg-success
+                    {% elif a.analysis.overall >= 60 %}bg-primary
+                    {% elif a.analysis.overall >= 40 %}bg-warning text-dark
+                    {% else %}bg-danger{% endif %}">
+                    Score: {{ a.analysis.overall }}/100
+                </span>
+            </div>
+
+            <div class="p-2 mb-2 rounded bg-light border-start border-3 border-primary">
+                <small class="text-muted text-uppercase fw-bold">Candidate Answer:</small>
+                <p class="mb-0 small">{% if a.skipped or not a.answer %}<em class="text-muted">Question skipped</em>{% else %}{{ a.answer }}{% endif %}</p>
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 small text-muted">
+                <span><i class="bi bi-file-earmark-text"></i> Words: <strong>{{ a.analysis.word_count }}</strong></span>
+                <span><i class="bi bi-mic"></i> Speed: <strong>{% if a.analysis.wpm %}{{ a.analysis.wpm }} WPM{% else %}Typed{% endif %}</strong></span>
+                <span><i class="bi bi-chat-quote"></i> Fillers: <strong>{{ a.analysis.filler_total }}</strong></span>
+                <span><i class="bi bi-bullseye"></i> Relevance: <strong>{{ a.analysis.relevance }}%</strong></span>
+            </div>
+
+            {% if a.analysis.matched_keywords %}
+            <div class="mt-2 small">
+                <span class="text-muted fw-bold">Keywords matched:</span>
+                {% for kw in a.analysis.matched_keywords %}
+                <span class="badge bg-secondary-subtle text-secondary-emphasis me-1">{{ kw }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if a.analysis.suggestions %}
+            <div class="mt-2 small text-muted">
+                <strong>Tip:</strong> {{ a.analysis.suggestions[0] }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-main" href="{{ url_for('setup') }}"><i class="bi bi-arrow-repeat"></i> Retake Interview</a>
+        <a class="btn btn-ghost" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Back to Dashboard</a>
+        <a class="btn btn-ghost" href="{{ url_for('history') }}"><i class="bi bi-clock-history"></i> Interview History</a>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+drawRadarChart("radarChart",
+    ["Communication", "Clarity", "Relevance", "Completeness"],
+    [{{ item.scores.communication }}, {{ item.scores.clarity }}, {{ item.scores.relevance }}, {{ item.scores.completeness }}]
+);
+</script>
+{% endblock %}

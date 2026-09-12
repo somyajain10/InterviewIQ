@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Answer Analysis — InterviewIQ{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 880px;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+        <span class="badge-soft">{{ live.type }} · {{ live.difficulty }} · {{ live.job_role }}</span>
+        <span class="text-muted fw-bold">Question {{ number }} of {{ total }}</span>
+    </div>
+    <h1 class="mb-3">Answer analysis</h1>
+    <div class="card-soft mb-3">
+        <div class="muted small text-uppercase fw-bold">Question</div>
+        <h5>{{ question }}</h5>
+        {% if answer %}
+        <div class="muted small text-uppercase fw-bold mt-3">Your answer</div>
+        <p class="mb-0">{{ answer }}</p>
+        {% else %}
+        <div class="alert alert-secondary mt-2 mb-0 py-2"><em>This question was skipped.</em></div>
+        {% endif %}
+    </div>
+
+    {% if not analysis.ai_used %}
+    <div class="alert alert-info d-flex align-items-center gap-2 py-2">
+        <i class="bi bi-info-circle"></i>
+        <span>{{ analysis.ai_message }}</span>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card-soft text-center h-100 d-flex flex-column justify-content-center">
+                <div class="muted fw-bold small text-uppercase">Answer Score</div>
+                <div class="score-big text-primary">{{ analysis.overall }}</div>
+                <span class="badge-soft mt-2 align-self-center">
+                    {% if analysis.overall >= 85 %}Excellent
+                    {% elif analysis.overall >= 70 %}Good
+                    {% elif analysis.overall >= 50 %}Average
+                    {% else %}Needs Practice{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card-soft">
+                <h6 class="mb-3 fw-bold">Performance Dimensions (0–100)</h6>
+                {% for label, value in [("Relevance", analysis.relevance), ("Clarity", analysis.clarity), ("Completeness", analysis.completeness), ("Communication", analysis.communication)] %}
+                <div class="d-flex justify-content-between"><span>{{ label }}</span><strong>{{ value }}%</strong></div>
+                <div class="bar-track mb-3"><div class="bar-fill" style="width: {{ value }}%"></div></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card-soft">
+                <div class="muted small">Word Count</div>
+                <h3>{{ analysis.word_count }}</h3>
+                <small class="muted">words provided</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card-soft">
+                <div class="muted small">Speaking Speed</div>
+                <h3>{% if analysis.wpm %}{{ analysis.wpm }} WPM{% else %}Typed{% endif %}</h3>
+                <small class="muted">{{ analysis.pace_note }}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card-soft">
+                <div class="muted small">Filler Words</div>
+                <h3>{{ analysis.filler_total }}</h3>
+                <small class="muted">{% if analysis.filler_total == 0 %}Zero fillers!{% else %}{{ analysis.filler_details|selectattr('1')|list|length }} types detected{% endif %}</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card-soft">
+                <div class="muted small">Keyword Match</div>
+                <h3>{{ analysis.relevance }}%</h3>
+                <small class="muted">{{ analysis.matched_keywords|length }} key terms covered</small>
+            </div>
+        </div>
+    </div>
+
+    {% if analysis.matched_keywords %}
+    <div class="card-soft mb-4 py-2 px-3">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="muted small fw-bold">Matched Keywords:</span>
+            {% for kw in analysis.matched_keywords %}
+            <span class="badge bg-light text-dark border">{{ kw }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-mic text-primary"></i>
+                    <h5 class="mb-0">Communication Feedback</h5>
+                </div>
+                <p class="muted mb-0">{{ analysis.communication_feedback }}</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-journal-code text-primary"></i>
+                    <h5 class="mb-0">Content & Technical Feedback</h5>
+                </div>
+                <p class="muted mb-0">{{ analysis.content_feedback }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <h5><i class="bi bi-check-circle text-success me-1"></i> What You Did Well</h5>
+                <ul class="mb-0">{% for s in analysis.strengths %}<li>{{ s }}</li>{% else %}<li>Keep practising to build strengths.</li>{% endfor %}</ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card-soft h-100">
+                <h5><i class="bi bi-exclamation-circle text-warning me-1"></i> Areas to Improve</h5>
+                <ul class="mb-0">{% for s in analysis.weaknesses %}<li>{{ s }}</li>{% else %}<li>No major issues detected.</li>{% endfor %}</ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-soft mb-4">
+        <h5><i class="bi bi-lightbulb text-primary me-1"></i> Improvement Suggestions</h5>
+        <ul>{% for s in analysis.suggestions %}<li>{{ s }}</li>{% endfor %}</ul>
+        {% if analysis.improved_answer %}
+        <h6 class="fw-bold mt-3">Model Answer Reference</h6>
+        <p class="mb-0 text-muted p-3 bg-light rounded">{{ analysis.improved_answer }}</p>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{{ url_for('analysis_continue') }}">
+        <button class="btn btn-main" type="submit">
+            {% if is_last %}
+            <i class="bi bi-check2-circle"></i> FINISH INTERVIEW & SEE FINAL REPORT
+            {% else %}
+            <i class="bi bi-arrow-right"></i> CONTINUE TO NEXT QUESTION ({{ number + 1 }}/{{ total }})
+            {% endif %}
+        </button>
+    </form>
+</div>
+{% endblock %}

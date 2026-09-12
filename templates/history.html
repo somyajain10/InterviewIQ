@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Interview History — InterviewIQ{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-2">Interview history</h1>
+    <p class="muted mb-4">Every completed interview is saved for your account.</p>
+
+    <form class="card-soft mb-4" method="get">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Type</label>
+                <select class="form-select" name="type">
+                    <option value="">All</option>
+                    {% for t in ["HR", "Technical", "Behavioral", "General"] %}
+                    <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Difficulty</label>
+                <select class="form-select" name="difficulty">
+                    <option value="">All</option>
+                    {% for d in ["Beginner", "Intermediate", "Advanced"] %}
+                    <option value="{{ d }}" {% if selected_difficulty == d %}selected{% endif %}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Sort</label>
+                <select class="form-select" name="sort">
+                    <option value="newest" {% if selected_sort == "newest" %}selected{% endif %}>Newest</option>
+                    <option value="oldest" {% if selected_sort == "oldest" %}selected{% endif %}>Oldest</option>
+                    <option value="highest" {% if selected_sort == "highest" %}selected{% endif %}>Highest Score</option>
+                    <option value="lowest" {% if selected_sort == "lowest" %}selected{% endif %}>Lowest Score</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-main w-100" type="submit">Apply</button>
+            </div>
+        </div>
+    </form>
+
+    {% if items %}
+    <div class="card-soft table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Date</th><th>Type</th><th>Difficulty</th><th>Score</th><th>Performance</th><th></th></tr></thead>
+            <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.created_at|when }}</td>
+                <td>{{ item.type }}</td>
+                <td>{{ item.difficulty }}</td>
+                <td><strong>{{ item.overall_score }}%</strong></td>
+                <td>
+                    <span class="badge 
+                        {% if item.overall_score >= 85 %}bg-success
+                        {% elif item.overall_score >= 70 %}bg-primary
+                        {% elif item.overall_score >= 50 %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ item.performance_category or (item.summary and item.summary.performance_category) or 'Completed' }}
+                    </span>
+                </td>
+                <td><a class="btn btn-sm btn-ghost" href="{{ url_for('report', interview_id=item.id) }}"><i class="bi bi-file-earmark-text"></i> View Report</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h5>No interviews in this view</h5>
+        <p class="muted">Complete a mock interview or clear the filters.</p>
+        <a class="btn btn-main" href="{{ url_for('setup') }}">Start Interview</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

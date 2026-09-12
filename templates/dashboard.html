@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — InterviewIQ{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Welcome back, {{ user.name.split()[0] }}</h1>
+            <p class="muted mb-0">Your interview practice hub.</p>
+        </div>
+        <a class="btn btn-main" href="{{ url_for('setup') }}">START NEW INTERVIEW</a>
+    </div>
+
+    <div class="mb-3 d-flex flex-wrap gap-2">
+        {% if demo_db %}<span class="status-chip">In-memory database (demo mode)</span>{% else %}<span class="status-chip">MongoDB connected</span>{% endif %}
+        {% if gemini_ready %}<span class="status-chip">Gemini ready</span>{% else %}<span class="status-chip">Gemini offline — basic analysis active</span>{% endif %}
+    </div>
+
+    <div class="stat-grid mb-4">
+        <div class="stat-card card-soft">
+            <div class="muted">Interview Readiness</div>
+            <h3>{{ stats.readiness }}%</h3>
+        </div>
+        <div class="stat-card card-soft">
+            <div class="muted">Interviews Completed</div>
+            <h3>{{ stats.count }}</h3>
+        </div>
+        <div class="stat-card card-soft">
+            <div class="muted">Average Score</div>
+            <h3>{{ stats.average }}%</h3>
+        </div>
+        <div class="stat-card card-soft">
+            <div class="muted">Best Score</div>
+            <h3>{{ stats.best }}%</h3>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card-soft">
+                <h5 class="mb-3">Performance over time</h5>
+                {% if stats.chart_scores %}
+                <canvas id="dashChart" height="140"></canvas>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-graph-up display-6"></i>
+                    <h5 class="mt-3">No interviews yet</h5>
+                    <p class="muted">Complete your first mock interview to unlock this chart.</p>
+                    <a class="btn btn-main" href="{{ url_for('setup') }}">Start a practice round</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card-soft h-100">
+                <h5 class="mb-3">Recent interviews</h5>
+                {% if stats.recent %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Date</th><th>Type</th><th>Score</th><th>Performance</th><th></th></tr></thead>
+                        <tbody>
+                        {% for item in stats.recent %}
+                        <tr>
+                            <td>{{ item.created_at|when }}</td>
+                            <td>{{ item.type }}<br><small class="muted">{{ item.difficulty }}</small></td>
+                            <td><strong>{{ item.overall_score }}%</strong></td>
+                            <td>
+                                <span class="badge 
+                                    {% if item.overall_score >= 85 %}bg-success
+                                    {% elif item.overall_score >= 70 %}bg-primary
+                                    {% elif item.overall_score >= 50 %}bg-warning text-dark
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ item.performance_category or (item.summary and item.summary.performance_category) or 'Completed' }}
+                                </span>
+                            </td>
+                            <td><a class="btn btn-sm btn-ghost" href="{{ url_for('report', interview_id=item.id) }}">Report</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="muted mb-0">Your completed interviews will appear here.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+{% if stats.chart_scores %}
+drawLineChart("dashChart", {{ stats.chart_labels|tojson }}, {{ stats.chart_scores|tojson }}, "Score");
+{% endif %}
+</script>
+{% endblock %}

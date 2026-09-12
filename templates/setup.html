@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Interview Setup — InterviewIQ{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 820px;">
+    <h1 class="mb-2">Interview setup</h1>
+    <p class="muted mb-4">Choose the round you want to practise. Questions are selected randomly from the InterviewIQ question bank.</p>
+    <form class="card-soft" method="post">
+        <h5 class="mb-3">Interview Type</h5>
+        <div class="choice-grid mb-4">
+            {% for t in ["HR", "Technical", "Behavioral", "General"] %}
+            <label class="choice"><input type="radio" name="interview_type" value="{{ t }}" {% if t == "HR" %}checked{% endif %}> {{ t }}</label>
+            {% endfor %}
+        </div>
+
+        <h5 class="mb-3">Difficulty</h5>
+        <div class="choice-grid mb-4">
+            {% for d in ["Easy", "Medium", "Hard"] %}
+            <label class="choice"><input type="radio" name="difficulty" value="{{ d }}" {% if d == "Easy" %}checked{% endif %}> {{ d }}</label>
+            {% endfor %}
+        </div>
+
+        <h5 class="mb-3">Number of questions</h5>
+        <div class="choice-grid mb-4">
+            {% for n in [3, 5, 10, 15] %}
+            <label class="choice"><input type="radio" name="count" value="{{ n }}" {% if n == 5 %}checked{% endif %}> {{ n }} questions</label>
+            {% endfor %}
+        </div>
+
+        <h5 class="mb-3">Job Role</h5>
+        <div class="choice-grid mb-4">
+            {% for r in ["Software Developer", "Web Developer", "Data Analyst", "General"] %}
+            <label class="choice"><input type="radio" name="job_role" value="{{ r }}" {% if r == "Software Developer" %}checked{% endif %}> {{ r }}</label>
+            {% endfor %}
+        </div>
+
+        <button class="btn btn-main" type="submit">START INTERVIEW</button>
+    </form>
+</div>
+{% endblock %}

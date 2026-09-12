@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Live Interview — InterviewIQ{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 880px;">
+    <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+        <span class="badge-soft">{{ live.type }} · {{ live.difficulty }} · {{ live.job_role }}</span>
+        <span class="timer" id="timer">00:00</span>
+    </div>
+    <div class="progress mb-4"><div class="progress-bar" style="width: {{ progress }}%"></div></div>
+    <div class="question-card card-soft mb-4">
+        <p class="muted mb-1">Question {{ number }} of {{ total }}</p>
+        <h2>{{ question.text }}</h2>
+    </div>
+
+    <form class="card-soft" method="post" action="{{ url_for('submit_answer') }}" id="answerForm">
+        <label class="form-label">Your answer</label>
+        <textarea class="form-control mb-3" name="answer" id="answer" rows="7" placeholder="Start recording or type your answer here..."></textarea>
+        <input type="hidden" name="duration" id="duration" value="0">
+        <input type="hidden" name="typed" id="typed" value="1">
+        <input type="hidden" name="skipped" id="skipped" value="0">
+
+        <p class="muted" id="speechNote">Type your answer instead, or use the microphone if your browser supports it.</p>
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+            <button type="button" class="mic-btn" id="startRec" title="Start recording"><i class="bi bi-mic"></i></button>
+            <button type="button" class="btn btn-ghost" id="stopRec">Stop recording</button>
+            <span id="recStatus" class="muted">Microphone idle</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-ghost" id="clearBtn"><i class="bi bi-eraser"></i> Clear</button>
+            {% if number == total %}
+            <button type="submit" class="btn btn-main"><i class="bi bi-check2-circle"></i> Finish Interview</button>
+            {% else %}
+            <button type="submit" class="btn btn-main"><i class="bi bi-arrow-right-circle"></i> Next Question</button>
+            {% endif %}
+            <button type="button" class="btn btn-ghost" id="skipBtn"><i class="bi bi-skip-forward"></i> Skip</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/interview.js') }}"></script>
+{% endblock %}
