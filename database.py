@@ -39,9 +39,9 @@ def _connect_mongo():
 
         mongo_client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=4000)
         mongo_client.admin.command("ping")
-        mongo_db = mongo_client.get_default_database()
-        if mongo_db is None or mongo_db.name in ("", "admin", "local"):
-            mongo_db = mongo_client["interviewiq"]
+        mongo_db = mongo_client["InterviewIQDB"]
+        # if mongo_db is None or mongo_db.name in ("", "admin", "local"):
+        #     mongo_db = mongo_client["interviewiq"]
         mongo_db.users.create_index("email", unique=True)
         USE_DEMO_DB = False
         DB_STATUS = "MongoDB Atlas connected."

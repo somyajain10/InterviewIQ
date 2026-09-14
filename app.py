@@ -50,6 +50,14 @@ def login_required(view):
         if not session.get("user_id"):
             flash("Please log in to continue.", "warning")
             return redirect(url_for("login"))
+
+        user = current_user()
+
+        if not user:
+            session.clear()
+            flash("Your session has expired. Please log in again.", "warning")
+            return redirect(url_for("login"))
+
         return view(*args, **kwargs)
 
     return wrapped
